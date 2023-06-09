@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
-const PostCard = ({post}) => {
+const PostCard = ({ post }) => {
     const [showModal, setShowModal] = useState(false);
     const [votes, setVotes] = useState(0);
 
@@ -16,12 +16,12 @@ const PostCard = ({post}) => {
                 <p className="card-text">{post.content}</p>
             </div>
             <div className="card-footer d-flex justify-content-between align-items-center">
-    <div>
-        <small className="text-muted">By {post.author}</small>
-        <p>Rate: {post.rate}</p>
-    </div>
-    <Button onClick={handleModalOpen} className="btn btn-secondary">Read More</Button>
-</div>
+                <div>
+                    <small className="text-muted">By {post.author?.firstName ? post.author?.firstName : post.author} {post.author?.lastName ? post.author?.lastName : post.author}</small>
+                    <p>Rate: {post.rate}</p>
+                </div>
+                <Button onClick={handleModalOpen} className="btn btn-secondary">Read More</Button>
+            </div>
 
 
             <Modal show={showModal} onHide={handleModalClose}>

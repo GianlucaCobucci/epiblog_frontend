@@ -2,44 +2,49 @@ import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { Toast } from '../utilities/notifications';
 import { Toaster } from 'react-hot-toast';
+import useDecodedSession from '../hooks/useDecodedSession';
 
-const NewPostModal = ({ show, handleClose, handleNewPost }) => {
-
+const NewPostModal = ({ show, handleClose }) => {
   const successToast = new Toast("Post pubblicato con successo");
   const errorToast = new Toast("Errore durante la creazione del post");
 
-  const [formData, setFormData] = useState({// Inizializza lo stato del form e del file
+  const actualUser = useDecodedSession();
+
+  const [formData, setFormData] = useState({
     title: '',
     content: '',
     author: '',
-    rate: '',
+    rate: 0,
     img: ''
   });
+
   const [file, setFile] = useState(null);
 
-  const handleInputChange = (e) => { // Gestisce il cambiamento dell'input del form
+  const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'file') { // Se l'input è un file. qui controllavo se il type era un file, ma devo controllare il nome
-      setFile(files[0]); // Imposta il file come il primo file selezionato
+    if (name === 'file') {
+      setFile(files[0]);
     } else {
-      setFormData((prevState) => ({ // Aggiorna lo stato del form con il nuovo valore dell'input
+      setFormData((prevState) => ({
         ...prevState,
         [name]: value
       }));
     }
   };
 
-  /* errori in handleInputChange: stavo gestendo come un normale 
-  input di testo mentre il mio input è un oggetto file non una stringa */
+  const handleRateChange = (event) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      rate: Number(event.target.value)
+    }));
+  };
 
-  const uploadFile = async (file) => {  // Carica il file
-    console.log('uploadFile è stata chiamata con il file:', file); //!!!!! non viene visualizzato in console
+  const uploadFile = async (file) => {
     const fileData = new FormData();
     fileData.append('img', file);
-    //console.log(fileData)
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/posts/cloudUpload`, { // Effettua una richiesta POST per caricare il file
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/posts/cloudUpload`, {
         method: 'POST',
         body: fileData,
       });
@@ -48,51 +53,45 @@ const NewPostModal = ({ show, handleClose, handleNewPost }) => {
         throw new Error("Errore durante l'upload del file");
       }
 
-      return await response.json(); // Ritorna la risposta come JSON
+      return await response.json();
     } catch (error) {
       console.error('Upload del file non riuscito:', error);
       throw error;
     }
   };
 
-  const handleSubmit = async (e) => {  // Gestisco l'invio del form
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      let img = '';
-      if (file) {
-        const response = await uploadFile(file);
-        img = response.img; //assegna l'URL dell'immagine a 'img'
-        console.log("URL immagine:", img); // Log dell'URL dell'immagine
+
+    if (file) {
+      try {
+        const uploadedFile = await uploadFile(file);
+        const postFormData = {
+          ...formData,
+          img: uploadedFile.img
+        };
+
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/posts`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(postFormData)
+        });
+
+        if (response.ok) {
+          successToast.success();
+        } else {
+          errorToast.show();
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.log(error);
+        errorToast.error();
       }
-
-      const postData = {
-        ...formData, // Copia tutti i campi del modulo nella variabile 'postData'
-        img // Aggiunge l'URL dell'immagine alla variabile 'postData'
-      };
-      console.log('Dati post:', postData); // Log dei dati del post //!!!! questo log mi restituisce img: ""
-
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/posts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Errore durante la creazione del post');
-      }
-
-      const { post: newPost } = await response.json(); // Estrae il nuovo post dalla risposta come oggetto 'newPost'
-      successToast.success('Post pubblicato con successo');
-      handleNewPost(newPost); // Aggiorna la lista dei post chiamando la funzione 'handleNewPost'
-      setTimeout(() => {
-        handleClose();
-      }, 2000);
-
-    } catch (error) {
-      console.error('Errore durante la creazione del post:', error);
-      errorToast.error('Errore nella pubblicazione del post');
+    } else {
+      console.error("Scegli almeno un file");
     }
   };
 
@@ -131,14 +130,18 @@ const NewPostModal = ({ show, handleClose, handleNewPost }) => {
           </Form.Group>
           <Form.Group controlId="author">
             <Form.Label>Autore</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Inserisci il tuo nome..."
+            <Form.Select
               name="author"
               value={formData.author}
               onChange={handleInputChange}
               required
-            />
+            >
+              <option>Scegli autore</option>
+              <option value={actualUser?.id}>
+                {actualUser?.firstName}
+                {actualUser?.lastName}
+              </option>
+            </Form.Select>
           </Form.Group>
           <Form.Group controlId="rate">
             <Form.Label>Voto</Form.Label>
@@ -147,7 +150,7 @@ const NewPostModal = ({ show, handleClose, handleNewPost }) => {
               placeholder="Inserisci un voto da 1 a 5..."
               name="rate"
               value={formData.rate}
-              onChange={handleInputChange}
+              onChange={handleRateChange}
               required
             />
           </Form.Group>
