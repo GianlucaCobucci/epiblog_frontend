@@ -3,6 +3,7 @@ import { Navbar, Nav, NavDropdown, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Logout from './Logout';
 
+
 const NavigationBar = ({ currentPage }) => {
     const [user, setUser] = useState(null);
 

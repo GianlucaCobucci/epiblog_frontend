@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import UserCard from '../Components/UserCard';
 import NavigationBar from '../Components/Navbar';
 import Footer from '../Components/Footer';
+import { Blocks } from 'react-loader-spinner'
+import '../Styles/Loader.css'
+
 
 const UsersList = () => {
   const [data, setData] = useState(null);
@@ -15,15 +18,15 @@ const UsersList = () => {
 
   const fetchData = async () => {
     setIsLoading(true);
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/users`,{
-      headers:{
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
+      headers: {
         "auth": JSON.parse(localStorage.getItem("loggedIn")).token
-        }
+      }
     });
     const data = await response.json()
-    if(response.ok){
-    setData(data)
-    setTotalUsers(data.users.length)
+    if (response.ok) {
+      setData(data)
+      setTotalUsers(data.users.length)
     }
     setIsLoading(false)
   };
@@ -40,7 +43,18 @@ const UsersList = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="loader-container">
+    {isLoading && (
+      <Blocks
+        visible={true}
+        height="80"
+        width="80"
+        ariaLabel="blocks-loading"
+        wrapperStyle={{}}
+        wrapperClass="blocks-wrapper"
+      />
+    )}
+  </div>;
   }
 
   return (

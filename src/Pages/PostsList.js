@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PostCard from '../Components/PostCard';
 import NavigationBar from '../Components/Navbar';
 import Footer from '../Components/Footer';
+import { Blocks } from  'react-loader-spinner'
+import '../Styles/Loader.css'
+
 
 const PostsList = () => {
   const [data, setData] = useState(null);
@@ -40,7 +43,18 @@ const PostsList = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="loader-container">
+    {isLoading && (
+      <Blocks
+        visible={true}
+        height="80"
+        width="80"
+        ariaLabel="blocks-loading"
+        wrapperStyle={{}}
+        wrapperClass="blocks-wrapper"
+      />
+    )}
+  </div>;
   }
 
   return (

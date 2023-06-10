@@ -3,13 +3,14 @@ import PostCard from '../Components/PostCard';
 import NavigationBar from '../Components/Navbar';
 import NewPostModal from '../Components/NewPostModal';
 import Footer from '../Components/Footer';
-
+import { Blocks } from  'react-loader-spinner'
+import '../Styles/Loader.css'
 
 const Homepage = () => {
   const [showModal, setShowModal] = useState(false);
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [visiblePosts, setVisiblePosts] = useState(3); // Numero iniziale di post visibili
+  const [visiblePosts, setVisiblePosts] = useState(3);// Numero iniziale di post visibili
   const [totalPosts, setTotalPosts] = useState(0); // Numero totale di post
 
   useEffect(() => {
@@ -55,7 +56,18 @@ const Homepage = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="loader-container">
+    {isLoading && (
+      <Blocks
+        visible={true}
+        height="80"
+        width="80"
+        ariaLabel="blocks-loading"
+        wrapperStyle={{}}
+        wrapperClass="blocks-wrapper"
+      />
+    )}
+  </div>;
   }
 
   return (
