@@ -27,7 +27,6 @@ const Homepage = () => {
       "auth": JSON.parse(localStorage.getItem("loggedIn")).token
       }
     });
-    //console.log(JSON.parse(localStorage.getItem("loggedIn")).token)
 
     const data = await response.json();
     if(response.ok){

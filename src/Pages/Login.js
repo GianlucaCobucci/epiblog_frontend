@@ -7,24 +7,24 @@ import { Toaster } from 'react-hot-toast';
 
 
 const Login = () => {
-  const [formData, setFormData] = useState({email: '', password: ''});
+  const [formData, setFormData] = useState({ email: '', password: '' });
 
   const successToast = new Toast("Login effettuato con successo!");
   const errorToast = new Toast("Login fallito");
 
   const navigate = useNavigate()
 
-    useEffect(()=>{
-      const user = JSON.parse(localStorage.getItem("loggedIn"))
-      //console.log(user)
-      if (user && user?.email && user?.email.length > 0){
-        successToast.success('Login avvenuto con successo'); // Utilizza il metodo success di Toast per visualizzare il toast di successo
-        setTimeout(() => {
-          navigate("/homepage", { replace: true })
-        }, 1500)
-      }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[navigate])
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("loggedIn"))
+    //console.log(user)
+    if (user && user?.email && user?.email.length > 0) {
+      successToast.success('Login avvenuto con successo'); // Utilizza il metodo success di Toast per visualizzare il toast di successo
+      setTimeout(() => {
+        navigate("/homepage", { replace: true })
+      }, 1500)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate])
 
 
   const [error, setError] = useState('');
@@ -47,14 +47,14 @@ const Login = () => {
         },
         body: JSON.stringify(formData)
       });
-  
+
       if (!response.ok) {
         throw new Error('Errore durante il login');
       }
-  
+
       const data = await response.json();
-  
-      if (response.ok){
+
+      if (response.ok) {
         const { token } = data; // Estrai il token dai dati di risposta
         const user = jwtDecode(token); // Decodifica il token per ottenere i dati dell'utente
         //console.log(user); // Stampa i dati dell'utente in console
@@ -64,12 +64,16 @@ const Login = () => {
           navigate("/homepage", { replace: true })
         }, 1500)
       }
-      
+
     } catch (error) {
       setError('Password o email non valida');
       errorToast.error('Login fallito'); // Utilizza il metodo error di Toast per visualizzare il toast di errore
     }
   };
+
+  const handleLoginWithGithub = () =>{
+    window.location.href = `${process.env.REACT_APP_API_URL}/auth/github`
+  }
 
   return (
     <>
@@ -119,6 +123,21 @@ const Login = () => {
                 <Button variant="danger" type="submit">
                   Sign Up
                 </Button>
+                <div className="text-center">
+                  <Button
+                    onClick={handleLoginWithGithub}
+                    variant="dark"
+                    className='m-2'
+                    style={{
+                      backgroundSize: '20px 20px',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center'
+                    }}
+                  >
+                    Log In with GitHub
+                  </Button>
+                </div>
+
               </div>
             </Form>
           </Card.Body>
