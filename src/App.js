@@ -12,6 +12,7 @@ function App() {
       <Routes>
 
         <Route exact path='/' element={<Login/>} />
+        <Route path="/success" element={<Homepage></Homepage>}/> 
 
         <Route element={<ProtectedRoutes />}>
           <Route path={'/homepage'} element={<Homepage/>} />
