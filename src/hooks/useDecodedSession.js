@@ -16,7 +16,7 @@ const useDecodedSession = () => {
         if(session && location.pathname !== "/login"){
             navigate("/homepage")
         }
-    },[navigate, session])
+    },[navigate, session, location.pathname])
     return decodedSession
 }
 

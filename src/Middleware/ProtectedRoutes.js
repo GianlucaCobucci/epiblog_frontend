@@ -24,6 +24,7 @@ const useSession = () => {
 const ProtectedRoutes = () => {
     const isAuth = useAuth()
     const session = useSession()
+    console.log(session)
     return isAuth ? <Outlet/> : <Login/>
 }
 
