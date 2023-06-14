@@ -5,6 +5,7 @@ import Homepage from './Pages/Homepage';
 import ProtectedRoutes from './Middleware/ProtectedRoutes.js';
 import UsersList from './Pages/UsersList';
 import PostsList from './Pages/PostsList';
+import Success from './Pages/Success';
 
 function App() {
   return (
@@ -12,7 +13,8 @@ function App() {
       <Routes>
 
         <Route exact path='/' element={<Login/>} />
-        <Route path="/success" element={<Homepage></Homepage>}/> 
+        <Route path="/success" element={<Success/>}/> 
+
 
         <Route element={<ProtectedRoutes />}>
           <Route path={'/homepage'} element={<Homepage/>} />

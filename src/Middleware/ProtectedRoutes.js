@@ -1,8 +1,33 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, json } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import jwt from 'jwt-decode'
+import Login from '../Pages/Login'
 
 const useAuth = () => {
+    return JSON.parse(localStorage.getItem('loggedIn'))
+}
+
+const useSession = () => {
+    const session = useAuth()
+    const decodedSession = session ? jwt(session.token) : null
+    const navigate = useNavigate()
+
+    useEffect (()=>{
+        if(!session){
+            navigate("/login", {replace: true})
+        }
+    },[navigate, session])
+    return decodedSession
+}
+
+const ProtectedRoutes = () => {
+    const isAuth = useAuth()
+    const session = useSession()
+    return isAuth ? <Outlet/> : <Login/>
+}
+
+/* const useAuth = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isAuthorized, setIsAuthorized] = useState(false);
 
@@ -28,7 +53,7 @@ const ProtectedRoutes = () => {
     }, [navigate, isLoaded, isAuthorized]);
 
     return <Outlet />;
-}
+} */
 
 
 export default ProtectedRoutes
